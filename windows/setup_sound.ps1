@@ -26,11 +26,13 @@ function DownloadVirtualSoundcard () {
 }
 
 function main () {
+    Push-Location $PSScriptRoot
     DownloadVirtualSoundcard
     Expand-Archive -LiteralPath vbcable.zip -DestinationPath vbcable
-    certutil -addstore "TrustedPublisher" make\vbcable.cer
+    certutil -addstore "TrustedPublisher" vbcable.cer
     # PnPutil.exe -i -a vbcable/vbMmeCable64_win7.inf
-    make\devcon.exe install vbcable\vbMmeCable64_win7.inf VBAudioVACWDM
+    devcon.exe install vbcable\vbMmeCable64_win7.inf VBAudioVACWDM
+    Pop-location
 }
 
 main
