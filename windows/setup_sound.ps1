@@ -31,7 +31,7 @@ function main () {
     Expand-Archive -LiteralPath vbcable.zip -DestinationPath vbcable
     certutil -addstore "TrustedPublisher" vbcable.cer
     # PnPutil.exe -i -a vbcable/vbMmeCable64_win7.inf
-    devcon.exe install vbcable\vbMmeCable64_win7.inf VBAudioVACWDM
+    .\devcon.exe install vbcable\vbMmeCable64_win7.inf VBAudioVACWDM
     Pop-location
 }
 
