@@ -32,7 +32,7 @@ jobs:
         name: Setup sound
       - run: pip install sounddevice
         name: Install sounddevice
-      - run: python -m sounddevice | grep -q "2 out"
+      - run: python -m sounddevice
         name: Print sounddevice output
       - run: python -m sounddevice | grep -q "2 out"
         name: Check that there is some output device
