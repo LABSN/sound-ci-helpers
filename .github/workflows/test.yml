@@ -1,0 +1,36 @@
+name: 'Test'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.ref }}
+  cancel-in-progress: true
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  job:
+    name: 'py3.10'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        shell: bash
+    env:
+      PYTHON_VERSION: '3.10'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+        name: Setup python
+      - run: ./auto.sh
+        name: Setup sound
+      - run: pip install python-sounddevice
+        name: Install sounddevice
+      - run: python -m sounddevice | tee /dev/tty | grep -q "2 out"
+        name: Check that there is some output device
