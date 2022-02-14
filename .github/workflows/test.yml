@@ -32,5 +32,5 @@ jobs:
         name: Setup sound
       - run: pip install sounddevice
         name: Install sounddevice
-      - run: python -m sounddevice | tee /dev/tty | grep -q "2 out"
+      - run: python -m sounddevice | tee /dev/stdout | grep -q "2 out"
         name: Check that there is some output device
