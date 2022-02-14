@@ -16,17 +16,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-20.04, ubuntu-18.04, windows-latest, macos-latest]
+        python: ['3.7', '3.10']
     defaults:
       run:
         shell: bash
-    env:
-      PYTHON_VERSION: '3.10'
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: ${{ matrix.python }}
         name: Setup python
       - run: ./auto.sh
         name: Setup sound
