@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-18.04, windows-2022, windows-2019, macos-11, macos-10.15]
+        os: [ubuntu-20.04, ubuntu-18.04, windows-2022, windows-2019, macos-11]
         python: ['3.7', '3.10']
     defaults:
       run:
@@ -33,5 +33,5 @@ jobs:
         name: Install sounddevice
       - run: python -m sounddevice
         name: Print sounddevice output
-      - run: python -m sounddevice | grep -q "2 out"
+      - run: python -m sounddevice | grep -q "[82] out"
         name: Check that there is some output device
