@@ -12,11 +12,11 @@ on:
 
 jobs:
   job:
-    name: 'py3.10'
+    name: ${{ matrix.os }} ${{ matrix.python}}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-18.04, windows-latest, macos-latest]
+        os: [ubuntu-20.04, ubuntu-18.04, windows-2022, windows-2019, macos-11, macos-10.15]
         python: ['3.7', '3.10']
     defaults:
       run:
