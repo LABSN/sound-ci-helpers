@@ -1,0 +1,37 @@
+name: 'Test'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.ref }}
+  cancel-in-progress: true
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  job:
+    name: ${{ matrix.os }} ${{ matrix.python}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-18.04, windows-2022, windows-2019, macos-11]
+        python: ['3.7', '3.10']
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+        name: Setup python
+      - run: ./auto.sh
+        name: Setup sound
+      - run: pip install sounddevice
+        name: Install sounddevice
+      - run: python -m sounddevice
+        name: Print sounddevice output
+      - run: python -m sounddevice | grep -q "[82] out"
+        name: Check that there is some output device
