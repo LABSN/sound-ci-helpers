@@ -1,0 +1,11 @@
+name: 'sound-ci-helper'
+description: 'Setup sound on CIs'
+author: Eric Larson
+branding:
+  icon: 'speaker'
+  color: 'blue'
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: ./auto.sh

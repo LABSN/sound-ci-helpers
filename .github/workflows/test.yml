@@ -27,12 +27,9 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
         name: Setup python
-      - run: ./auto.sh
-        name: Setup sound
+      - uses: ./
       - run: pip install sounddevice
-        name: Install sounddevice
       - run: python -m sounddevice
-        name: Print sounddevice output
       - run: |
           set -o pipefail
           python -m sounddevice | grep "[82] out"
