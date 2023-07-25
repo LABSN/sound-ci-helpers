@@ -7,5 +7,15 @@ branding:
 runs:
   using: "composite"
   steps:
-    - run: "${{ github.action_path }}/auto.sh"
-      shell: bash
+    - run: "${{ github.action_path }}/linux/setup_sound.sh"
+      shell: bash -e {0}
+      if: runner.os == 'Linux'
+      name: Linux
+    - run: "${{ github.action_path }}/macos/setup_sound.sh"
+      shell: bash -e {0}
+      if: runner.os == 'macOS'
+      name: macOS
+    - run: "${{ github.action_path }}/windows/setup_sound.ps1"
+      shell: powershell -Command {0}
+      if: runner.os == 'Windows'
+      name: Windows
