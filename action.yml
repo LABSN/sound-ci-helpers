@@ -8,4 +8,4 @@ runs:
   using: "composite"
   steps:
     - shell: bash
-      run: ./auto.sh
+      run: ${{ github.action_path }}/auto.sh
