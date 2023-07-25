@@ -7,5 +7,5 @@ branding:
 runs:
   using: "composite"
   steps:
-    - run: ${{ github.action_path }}/auto.sh
+    - run: "${{ github.action_path }}/auto.sh"
       shell: bash
