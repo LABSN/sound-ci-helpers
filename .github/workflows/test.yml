@@ -15,6 +15,7 @@ jobs:
     name: ${{ matrix.os }} ${{ matrix.python}}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04, windows-2022, windows-2019, macos-12, macos-11]
         python: ['3.10']
