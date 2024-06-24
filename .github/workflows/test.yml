@@ -34,3 +34,8 @@ jobs:
           set -xeo pipefail
           python -m sounddevice | grep "[82] out"
         name: Check that there is some output device
+      - run: sleep 10
+      - run: |
+          set -xeo pipefail
+          python -m sounddevice | grep "[82] out"
+        name: Check that there is some output device after sleep
