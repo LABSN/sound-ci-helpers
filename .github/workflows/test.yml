@@ -18,20 +18,19 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04, windows-2022, windows-2019, macos-14, macos-13, macos-12]
-        python: ['3.12']
+        python: ['3.12', '3.8']
     defaults:
       run:
         shell: bash -e {0}
     steps:
       - uses: actions/checkout@v4
+      - uses: ./
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-        name: Setup python
-      - uses: ./
       - run: pip install sounddevice
       - run: python -m sounddevice
       - run: |
-          set -o pipefail
+          set -xeo pipefail
           python -m sounddevice | grep "[82] out"
         name: Check that there is some output device
