@@ -6,3 +6,5 @@ Usage as GH action:
 ```
 uses: LABSN/sound-ci-helpers@v1
 ```
+
+tiny change
