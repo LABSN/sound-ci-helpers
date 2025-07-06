@@ -1,38 +1,73 @@
-# Someday if this breaks we can use:
-# https://github.com/duncanthrax/scream/tree/master/Install
-# But it signs using a SHA that is buggy with Windows 7 so don't use for now
-# https://support.microsoft.com/en-us/help/2921916/the-untrusted-publisher-dialog-box-appears-when-you-install-a-driver-i
-function DownloadVirtualSoundcard () {
-    $webclient = New-Object System.Net.WebClient
-    $url = "https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack43.zip"
-    $filepath = $pwd.Path + "\vbcable.zip"
-    Write-Host "Downloading" $url
-    $retry_attempts = 2
-    for($i=0; $i -lt $retry_attempts; $i++){
-        try {
-            $webclient.DownloadFile($url, $filepath)
-            break
-        }
-        Catch [Exception]{
-            Start-Sleep 1
-        }
-    }
-    if (Test-Path $filepath) {
-        Write-Host "File saved at" $filepath
-    } else {
-        # Retry once to get the error message if any at the last try
-        $webclient.DownloadFile($url, $filepath)
+param (
+  [string]$Url = 'https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack45.zip',
+  [string]$ZipName = 'vbcable.zip',
+  [string]$ExtractDir = 'vbcable'
+)
+
+function Download-Zip {
+  param($Url, $Out)
+  Write-Host "Downloading $Url → $Out"
+  $wc = New-Object System.Net.WebClient
+  0..2 | ForEach-Object {
+    try { $wc.DownloadFile($Url, $Out); return } catch { Start-Sleep 1 }
+  }
+  $wc.DownloadFile($Url, $Out)
+}
+
+function Expand-Zip {
+  param($Zip, $Dest)
+  Write-Host "Extracting $Zip → $Dest"
+  Expand-Archive -LiteralPath $Zip -DestinationPath $Dest -Force
+}
+
+function Trust-Cert {
+  param($Cer)
+  Write-Host "Adding certificate to TrustedPublisher: $Cer"
+  certutil -addstore -f TrustedPublisher $Cer
+}
+
+function Install-Driver {
+  param($InfDir)
+  Write-Host "Installing driver(s) from $InfDir"
+  Get-ChildItem -Path $InfDir -Filter 'vbMmeCable64_win*.inf' -Recurse |
+    ForEach-Object {
+      $inf = $_.FullName
+      Write-Host "  devcon.exe install `"$inf`" VBAudioVACWDM"
+      & "$PSScriptRoot\devcon.exe" install "$inf" VBAudioVACWDM
     }
 }
 
-function main () {
-    Push-Location $PSScriptRoot
-    DownloadVirtualSoundcard
-    Expand-Archive -LiteralPath vbcable.zip -DestinationPath vbcable
-    certutil -addstore "TrustedPublisher" vbcable.cer
-    # PnPutil.exe -i -a vbcable/vbMmeCable64_win7.inf
-    .\devcon.exe install vbcable\vbMmeCable64_win7.inf VBAudioVACWDM
-    Pop-location
+function Restart-AudioServices {
+  Write-Host "Restarting Audio services to pick up new device"
+  foreach ($svc in 'AudioSrv','AudioEndpointBuilder') {
+    if (Get-Service $svc -ErrorAction SilentlyContinue) {
+      Restart-Service -Name $svc -Force
+    }
+  }
 }
 
-main
+function Dump-Devices {
+  Write-Host "Current sound devices:"
+  Get-CimInstance Win32_SoundDevice |
+    Select-Object Name,Status |
+    Format-Table -AutoSize
+}
+
+Push-Location $PSScriptRoot
+
+Download-Zip -Url $Url -Out (Join-Path $PSScriptRoot $ZipName)
+Expand-Zip -Zip (Join-Path $PSScriptRoot $ZipName) -Dest (Join-Path $PSScriptRoot $ExtractDir)
+
+$cer = Join-Path $PSScriptRoot 'vbcable.cer'
+if (Test-Path $cer) {
+  Write-Host "Adding certificate to TrustedPublisher: $cer"
+  certutil.exe -addstore -f TrustedPublisher $cer
+} else {
+  Write-Error "Certificate not found at $cer; cannot trust the driver."
+}
+Install-Driver -InfDir (Join-Path $PSScriptRoot $ExtractDir)
+
+Restart-AudioServices
+Dump-Devices
+
+Pop-Location
