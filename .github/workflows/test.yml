@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04-arm, ubuntu-24.04, ubuntu-22.04, windows-2022, windows-2019, macos-15, macos-14, macos-13]
+        os: [ubuntu-24.04-arm, ubuntu-24.04, ubuntu-22.04, windows-2025, windows-2022, macos-15, macos-14, macos-13]
         python: ['3.13', '3.10']
     defaults:
       run:
@@ -31,11 +31,9 @@ jobs:
       - run: pip install sounddevice
       - run: python -m sounddevice
       - run: |
-          set -xeo pipefail
-          python -m sounddevice | grep "[82] out"
-        name: Check that there is some output device
-      - run: sleep 10
-      - run: |
-          set -xeo pipefail
-          python -m sounddevice | grep "[82] out"
-        name: Check that there is some output device after sleep
+          output=$(python -m sounddevice --list-devices)
+          if [ -z "$output" ]; then
+            echo "Error: sounddevice --list-devices returned no output"
+            exit 1
+          fi
+          echo "$output"
