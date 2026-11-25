@@ -23,6 +23,7 @@ jobs:
           - ubuntu-26.04
           - ubuntu-24.04
           - ubuntu-22.04
+          - windows-11-arm
           - windows-2025
           - windows-2022
           - macos-26
